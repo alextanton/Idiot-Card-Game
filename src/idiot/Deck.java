@@ -50,9 +50,7 @@ public class Deck {
 	}
 	
 	public Card getCard(){
-		Random rand = new Random();
-		int  n = rand.nextInt(51);
-		Card card = this.deck.get(n);
+		Card card = this.deck.get(0);
 		this.deck.remove(card);
 		return card;
 	}

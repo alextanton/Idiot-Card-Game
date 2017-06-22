@@ -1,17 +1,25 @@
 package idiot;
-import java.util.ArrayList;
 
 import idiot.Deck;
 
 public class Game {
     Deck discard = new Deck(true);
 	Deck draw = new Deck(false);
-	ArrayList<Card> hand = new ArrayList<Card>();
+	Player player1 = new Player();
+	Computer computer = new Computer();
 	
-	public void deal(){
-		for(int i=0;i<3;i++){
-			hand.add(this.draw.getCard());
-		}
+	private void deal(){
+		this.player1.faceDown.putCards(draw.getCard(), draw.getCard(), draw.getCard());
+		this.computer.faceDown.putCards(draw.getCard(), draw.getCard(), draw.getCard());
+		this.player1.faceUp.putCards(draw.getCard(), draw.getCard(), draw.getCard());
+		this.computer.faceUp.putCards(draw.getCard(), draw.getCard(), draw.getCard());
+		this.player1.hand.putCards(draw.getCard(), draw.getCard(), draw.getCard());
+		this.computer.hand.putCards(draw.getCard(), draw.getCard(), draw.getCard());
+	}
+	
+	public void start(){
+		draw.shuffle();
+		deal();
 	}
 	
 	public void play(){
@@ -23,8 +31,8 @@ public class Game {
 		}
 	}
 	
-	public void showHand(){
-		for(Card temp : hand){
+	public void showHand(Hand h){
+		for(Card temp : h.getAll()){
 			System.out.println(Numbers.values()[temp.getNum()] + " of " + Suits.values()[temp.getSuit()]);
 		}
 	}

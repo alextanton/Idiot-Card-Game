@@ -18,8 +18,14 @@ public class Play {
 		}
 		s.close();
 		Game g = new Game();
-		g.deal();
-		g.showHand();
+		System.out.println("Dealing the cards...");
+		g.start();
+		System.out.println("Face Up Cards...");
+		g.showHand(g.player1.faceUp);
+		System.out.println("Your Hand...");
+		g.showHand(g.player1.hand);
+		
+		
 	}
 	
 }
