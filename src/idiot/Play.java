@@ -7,16 +7,6 @@ public class Play {
 		boolean c = true;
 		Scanner s = new Scanner(System.in);
 		System.out.println("Welcome...");
-		while(c){
-			System.out.println("Wanna play?(y/n)");
-			String wannaPlay = s.nextLine();
-			if(wannaPlay.toLowerCase().equals("y")){
-				c = false;
-			} else if(wannaPlay.toLowerCase().equals("n")){
-				System.exit(0);
-			}
-		}
-		s.close();
 		Game g = new Game();
 		System.out.println("Dealing the cards...");
 		g.start();
@@ -24,8 +14,19 @@ public class Play {
 		g.showHand(g.player1.faceUp);
 		System.out.println("Your Hand...");
 		g.showHand(g.player1.hand);
-		
-		
+		//start gameplay
+		System.out.println("Your turn player1...");
+		g.showOptions();
+		while(c){
+			System.out.println("What is your choice: ");
+			String action = s.nextLine();
+			try{
+				g.commands.get(action.charAt(0)).run();
+			} catch(Exception e){
+				continue;
+			}
+			g.printCardsInDiscard();
+		}
 	}
 	
 }

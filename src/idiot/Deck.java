@@ -14,7 +14,11 @@ public class Deck {
 			createDeck();
 		}
 	}
-
+	
+	public Card get(int i){
+		return this.discard.get(i);
+	}
+	
 	private void createDeck(){
 		for(int i = 0;i < 4;i++){
 			for(int j = 0;j < 13; j++){
@@ -57,5 +61,21 @@ public class Deck {
 	
 	public void blowItUp(){
 		this.discard.clear();
+	}
+	
+	public int getSize(){
+		if(this.isDiscard){
+			return this.deck.size();
+		} else{
+			return this.discard.size();
+		}
+	}
+	
+	public void putDownCards(Card[] cards){
+		for(Card temp : cards){
+			System.out.println(temp.cardAsReadable());
+			this.discard(temp);
+		}
+		System.out.println(this.discard.get(0).cardAsReadable());
 	}
 }

@@ -22,4 +22,8 @@ public class Card {
 	public int getNum(){
 		return this.num;
 	}
+	
+	public String cardAsReadable(){
+		return Numbers.values()[this.num] + " of " + Suits.values()[this.suit];
+	}
 }
