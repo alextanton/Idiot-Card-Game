@@ -25,7 +25,6 @@ public class Play {
 			} catch(Exception e){
 				continue;
 			}
-			g.printCardsInDiscard();
 		}
 	}
 	

@@ -7,19 +7,26 @@ import java.util.Scanner;
 import idiot.Deck;
 
 public class Game {
-    Deck discard = new Deck(true);
-	Deck draw = new Deck(false);
+    private Deck discard = new Deck(true);
+	private Deck draw = new Deck(false);
 	Player player1 = new Player();
-	Computer computer = new Computer();
+	private Computer computer = new Computer();
+	Map<String, Runnable> abilityMap = new HashMap<String, Runnable>(){{
+		put("7", () -> isSeven());
+		put("9", () -> isNine());
+		put("10", () -> isTen());
+		put("2", () -> isTwo());
+	}};
 	Map<Character, Runnable> commands = new HashMap<>();
-	
+
+
 	private void deal(){
 		commands.put('1', () -> showHand(this.player1.hand));
 		commands.put('2', () -> pickCards());
 		commands.put('3', () -> System.out.println("Help"));
 		commands.put('4', () -> System.out.println("Help"));
 		commands.put('h', () -> showHand(this.player1.hand));
-		
+
 		this.player1.faceDown.putCards(draw.getCard(), draw.getCard(), draw.getCard());
 		this.computer.faceDown.putCards(draw.getCard(), draw.getCard(), draw.getCard());
 		this.player1.faceUp.putCards(draw.getCard(), draw.getCard(), draw.getCard());
@@ -72,18 +79,22 @@ public class Game {
 		}
 	}
 	
-	public void pickCards(){
+	public void pickCards() {
 		Scanner s = new Scanner(System.in);
 		System.out.println("Choose what card(s) you would like to put down:");
 		showHand(this.player1.hand);
 		String cards = s.nextLine();
-		if(cards.length() == 0){
+		if (cards.length() == 0) {
 			System.out.println("Please choose a card");
 			return;
 		}
 		Card[] arrCards = parseCardChoice(cards);
+		if(!ableToPlay(arrCards)){
+			System.out.print("Can't play those cards");
+			return;
+		}
 		this.discard.putDownCards(arrCards);
-		if(this.checkForFour()){
+		if (this.checkForFour()) {
 			this.discard.blowItUp();
 		}
 	}
@@ -99,6 +110,21 @@ public class Game {
 			i++;
 		}
 		return cs;
+	}
+
+	private boolean isSeven(){
+
+	}
+
+	public boolean ableToPlay(Card[] arr){
+		if(arr.length > 1) {
+			int pipVal = arr[0].cardToInt();
+			for(int i=0;i<arr.length;i++){
+				if(pipVal != arr[i].cardToInt()){
+					return false;
+				}
+			}
+		} else if()
 	}
 }
 

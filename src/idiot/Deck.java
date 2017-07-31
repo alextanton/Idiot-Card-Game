@@ -43,6 +43,11 @@ public class Deck {
 			this.discard.add(c);
 		}
 	}
+
+	public Card getTopDiscard(){
+		Card card = this.discard.get(this.discard.size());
+		return card;
+	}
 	
 	public Card[] getFirstFour(){
 		Card[] temp = new Card[4];
