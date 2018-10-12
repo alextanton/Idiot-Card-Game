@@ -1,14 +1,13 @@
 package idiot;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Hand {
-	ArrayList<Card> cards = new ArrayList<Card>();
+	ArrayList<Card> cards = new ArrayList<>();
 	
-	public void putCards(Card c, Card cc, Card ccc){
-		this.cards.add(c);
-		this.cards.add(cc);
-		this.cards.add(ccc);
+	void putCards(List<Card> cards){
+		this.cards = (ArrayList<Card>)cards;
 	}
 	
 	public ArrayList<Card> getAll(){

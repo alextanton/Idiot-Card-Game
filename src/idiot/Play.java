@@ -3,27 +3,28 @@ import java.util.Scanner;
 
 public class Play {
 	
-	public static void main(String[] args){
-		boolean c = true;
+	public static void main(String[] args) {
 		Scanner s = new Scanner(System.in);
-		System.out.println("Welcome...");
 		Game g = new Game();
-		System.out.println("Dealing the cards...");
 		g.start();
-		System.out.println("Face Up Cards...");
-		g.showHand(g.player1.faceUp);
-		System.out.println("Your Hand...");
-		g.showHand(g.player1.hand);
-		//start gameplay
-		System.out.println("Your turn player1...");
-		g.showOptions();
-		while(c){
+		while(true){
+			g.showOptions();
 			System.out.println("What is your choice: ");
 			String action = s.nextLine();
 			try{
-				g.commands.get(action.charAt(0)).run();
+				switch(Integer.parseInt("" + action.charAt(0))) {
+					case 2: g.pickCards(g.player1.hand);
+						break;
+					case 4: System.out.println(g.showTopCardAsReadable());
+						break;
+					case 1: g.showHand(g.player1.hand);
+						break;
+					case 3: g.player1.faceUp.cards.forEach((c) -> System.out.println(c.cardAsReadable()));
+						break;
+					default: System.out.println("ERROR");
+				}
 			} catch(Exception e){
-				continue;
+				System.out.println(e.getMessage());
 			}
 		}
 	}

@@ -1,130 +1,87 @@
 package idiot;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import idiot.services.CardService;
 
-import idiot.Deck;
+import java.util.*;
 
 public class Game {
-    private Deck discard = new Deck(true);
+	private Deck discard = new Deck(true);
 	private Deck draw = new Deck(false);
 	Player player1 = new Player();
 	private Computer computer = new Computer();
-	Map<String, Runnable> abilityMap = new HashMap<String, Runnable>(){{
-		put("7", () -> isSeven());
-		put("9", () -> isNine());
-		put("10", () -> isTen());
-		put("2", () -> isTwo());
-	}};
-	Map<Character, Runnable> commands = new HashMap<>();
+	private CardService service = CardService.getInstance(draw, discard);
 
+	private void deal() {
 
-	private void deal(){
-		commands.put('1', () -> showHand(this.player1.hand));
-		commands.put('2', () -> pickCards());
-		commands.put('3', () -> System.out.println("Help"));
-		commands.put('4', () -> System.out.println("Help"));
-		commands.put('h', () -> showHand(this.player1.hand));
-
-		this.player1.faceDown.putCards(draw.getCard(), draw.getCard(), draw.getCard());
-		this.computer.faceDown.putCards(draw.getCard(), draw.getCard(), draw.getCard());
-		this.player1.faceUp.putCards(draw.getCard(), draw.getCard(), draw.getCard());
-		this.computer.faceUp.putCards(draw.getCard(), draw.getCard(), draw.getCard());
-		this.player1.hand.putCards(draw.getCard(), draw.getCard(), draw.getCard());
-		this.computer.hand.putCards(draw.getCard(), draw.getCard(), draw.getCard());
+		this.player1.faceDown.putCards(this.getThreeCards());
+		this.computer.faceDown.putCards(this.getThreeCards());
+		this.player1.faceUp.putCards(this.getThreeCards());
+		this.computer.faceUp.putCards(this.getThreeCards());
+		this.player1.hand.putCards(this.getThreeCards());
+		this.computer.hand.putCards(this.getThreeCards());
 	}
-	
-	public void start(){
+
+	void start() {
 		draw.shuffle();
 		deal();
+		this.discard.discard(this.draw.getCard());
 	}
-	
-	public void play(){
-		Card c = this.draw.getCard();
-		System.out.println(c.toString());
-		discard.discard(c);
-		if(checkForFour()){
-			this.discard.blowItUp();
-		}
-	}
-	
-	public boolean checkForFour(){
-		if(this.discard.getSize() >= 4){
-			Card[] temp = this.discard.getFirstFour();
-			for(int i = 0; i < 3; i++){
-				if(temp[i] == temp[i+1]){
-					continue;
-				} else {
-					return false;
-				}
-			}
-			return true;
-		} else {
-			return false;
-		}
-	}
-	
-	public void showOptions(){
+
+	void showOptions() {
 		System.out.println("Here are your options:");
 		System.out.println("[1] Show cards in hand");
 		System.out.println("[2] Pick cards to put down");
 		System.out.println("[3] Show faceup cards");
 		System.out.println("[4] Show top card");
 	}
-	
-	public void showHand(Hand h){
-		for(Card temp : h.getAll()){
-			System.out.println("["+ h.cards.indexOf(temp) +"] " + Numbers.values()[temp.getNum()] + " of " + Suits.values()[temp.getSuit()]);
+
+	void showHand(Hand h) {
+		for (Card temp : h.getAll()) {
+			System.out.println("[" + h.cards.indexOf(temp) + "] " + Numbers.m.get(temp.getNum()) + " of " + Suits.values()[temp.getSuit()]);
 		}
 	}
-	
-	public void pickCards() {
+
+	void pickCards(Hand hand) {
 		Scanner s = new Scanner(System.in);
 		System.out.println("Choose what card(s) you would like to put down:");
-		showHand(this.player1.hand);
-		String cards = s.nextLine();
-		if (cards.length() == 0) {
-			System.out.println("Please choose a card");
-			return;
-		}
-		Card[] arrCards = parseCardChoice(cards);
-		if(!ableToPlay(arrCards)){
-			System.out.print("Can't play those cards");
-			return;
-		}
-		this.discard.putDownCards(arrCards);
-		if (this.checkForFour()) {
-			this.discard.blowItUp();
-		}
-	}
-	
-	public Card[] parseCardChoice(String c){
-		c += " ";
-		int i = 0;
-		String[] cards = c.split(" ");
-		Card[] cs = new Card[cards.length];
-		for(String s : cards){
-			int n = Integer.parseInt(s);
-			cs[i] = this.player1.hand.cards.get(n);
-			i++;
-		}
-		return cs;
-	}
-
-	private boolean isSeven(){
-
-	}
-
-	public boolean ableToPlay(Card[] arr){
-		if(arr.length > 1) {
-			int pipVal = arr[0].cardToInt();
-			for(int i=0;i<arr.length;i++){
-				if(pipVal != arr[i].cardToInt()){
-					return false;
+		showHand(hand);
+		int choice = s.hasNextInt() ? s.nextInt() : -1;
+		if((choice < 0 || choice > hand.getAll().size()) || !canPlayCard(hand.cards.get(choice).getNum())){
+			System.out.println("Invalid Selection");
+			pickCards(hand);
+		} else {
+			try {
+				if(service.handleCard(hand.cards.get(choice).getNum())){
+					System.out.println("You played " + hand.cards.get(choice).cardAsReadable());
 				}
+				this.service.discardAndReplace(hand.cards.get(choice), hand);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} else if()
+		}
+	}
+
+	private ArrayList<Card> getThreeCards(){
+		return new ArrayList<>(Arrays.asList(this.draw.getCard(), this.draw.getCard(), this.draw.getCard()));
+	}
+
+	String showTopCardAsReadable(){
+		return this.discard.get(this.discard.getSize() - 1).cardAsReadable();
+	}
+	private Card showTopCard(){
+		return this.discard.get(this.discard.getSize() - 1);
+	}
+
+	private boolean canPlayCard(int c){
+		boolean canPlayCard = false;
+		Card currentCard = this.showTopCard();
+		if(currentCard.getNum() == 5 && c <= currentCard.getNum()){
+			canPlayCard = true;
+		} else if(currentCard.getNum() <= c){
+			canPlayCard = true;
+		}
+		return canPlayCard;
 	}
 }
+
 
